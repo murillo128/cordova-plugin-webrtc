@@ -1,0 +1,17 @@
+{
+  "name": "cordova-plugin-webrtc",
+  "version": "0.1.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "author": "",
+  "license": "Apache",
+  "devDependencies": {
+    "bower": "^1.3.7",
+    "gulp": "^3.8.8",
+    "gulp-load-plugins": "^0.6.0",
+    "gulp-webpack": "^0.3.0",
+    "jshint-stylish": "^0.4.0",
+    "webpack": "^1.4.0-beta6",
+    "webpack-dev-server": "^1.6.4"
+  }
+}
