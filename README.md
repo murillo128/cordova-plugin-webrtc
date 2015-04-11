@@ -4,20 +4,89 @@ WebRTC Plugin for Cordova
 
 ### NOTE: This project is not production ready.
 This project aims to implement the full WebRTC API on Cordova.
-As a mid-term goal, we aim to support all WebRTC sample from [here](https://github.com/webrtc/samples), as well as the AppRTCDemo TODO LINK.
 
-- shim implementations:
+- Shim implementations:
 	- WebRTC
 		- RTCPeerConnection
 		- RTCICECandidate
 		- RTCSessionDescription
 		- RTCDataChannel
-	- getUserMedia (not really part of WebRTC, but needed to get handles for input media)
-		- MediaStream (same as above)
+	- getUserMedia (not really part of WebRTC, but needed to get for audio/video input)
+		- MediaStream
 		- MediaTrack
 
-#### WebRTC samples working state
+## Supported Platforms
+- __iOS6+__
+- __Android 4.0+__ coming soon
+
+## Installation
+The plugin is not available yet on the Cordova Plugin Registry.
+
+Execute the following in your cordova project:
+
+```shell
+# for latest version
+cordova plugin add git@github.com:remotium/cordova-plugin-webrtc.git
+# for specific branch
+cordova plugin add git@github.com:remotium/cordova-plugin-webrtc.git@branch
+```
+
+## Usage
+Just use exactly the same WebRTC code as you would be using for a browser page!
+Bear in mind the following quirks:
+
+- Only use the WebRTC related APIs after getting cordova's *deviceReady* event.
+- Use `<webrtc-video>` tag instead of `<video>` if you dont want any video player skin to be shown. If you do that, you'll need to use el.setAttribute('src', ...) instead of el.src for the MutableObserver to detect changes in the 'src' element.
+Example:
+
+```javascript
+// ------- for <video> tags -------
+navigator.getUserMedia({video: true},
+   function(stream) {
+      var video = document.querySelector('video');
+      video.src = URL.createObjectURL(stream);
+   }, ...}
+);
+// ------- for <webrtc-video> tags -------
+navigator.getUserMedia({video: true},
+   function(stream) {
+      var video = document.querySelector('webrtc-video');
+      video.setAttribute('src', URL.createObjectURL(stream));
+   }, ...}
+);
+```
+
+- Use pc.dispose() to clear the native peer connection object after closing it.
+
+### Current Limitations
+- Canvas operations not supported over the WebRTC video elements.
+- getUserMedia only returns front camera.
+- getUserMedia overrides native implementation (if it exists). Do not use it for anything else.
+- Audio tracks will be enabled even if the video tag is not in the DOM.
+- No MediaStream callbacks
+- Cannot detect javascript object garbage collection, thus everything has to be disposed manually (use obj.dispose() for that).
+
+### Implementation details
+To make this implementation work *almost* seamless with the WebRTC standard, we use some *hacks* that allow us to overlay the native WebRTC video views on the page.
+
+- Use MutationObserver to listen for changing <video> tags.
+- Implement MediaStream on top of Blob, so it is compatible with URL.createObjectURL.
+
+## How to build for development
+You shall already have the *npm* tool (required for cordova). Just do:
+
+```
+npm install
+bower install
+gulp build
+```
+
+#### WebRTC working samples (tested)
+As a mid-term goal, we aim to support all WebRTC samples from [here](https://github.com/webrtc/samples), as well as the javascript AppRTC demo.
+
 Note, the samples were only modified for its scripts only execute after cordova's *deviceReady* event is triggered.
+
+Currently tested and working samples:
 
 - getUserMedia
 	- Basic getUserMedia demo
@@ -25,47 +94,6 @@ Note, the samples were only modified for its scripts only execute after cordova'
 	- Audio-only peer connection
 - RTCDataChannel
 	- Transmit text
-
-### Implementation details
-To make this implementation work *almost* seamless with the WebRTC standard, we use some quirks that allow us to overlay the native WebRTC video views on the 
-
-- Use MutationObserver to listen for changing <video> tags
-- Fake blob with stream id
-
-### Quirks
-
-- You need to setAttribute
-- Use pc.dispose() to clear up
-
-### Current Limitations
-- Canvas operations not supported over the WebRTC video elements.
-- getUserMedia only returns front camera.
-- getUserMedia overrides native implementation (if exists). Do not use it for anything else.
-- Audio tracks will be enabled even if the video tag is not in the DOM.
-- No MediaStream callbacks
-- Cannot detect javascript object gc, thus cannot automatically free native WebRTC objects (use obj.dispose() for that).
-
-### Migration
-Dont forget for deviceReady before using WebRTC API
-<webrtc-video> not to show the play thingy
-
-## Supported Platforms
-- __iOS6+__
-- __Android 4.0+__ coming soon
-
-## Installation
-The plugin is not yet available on the Cordova Plugin Registry.
-To install latest version, run the following on your cordova project:
-
-```shell
-#latest version
-cordova plugin add git@github.com:remotium/cordova-plugin-webrtc.git
-#specific branch
-cordova plugin add git@github.com:remotium/cordova-plugin-webrtc.git@branch
-```
-
-## How to build
-We use gulp to 
 
 ## Contributing
 
